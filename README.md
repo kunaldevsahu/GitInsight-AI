@@ -62,7 +62,6 @@ Once running, input any public GitHub username (e.g., `torvalds` or `timothycros
 
 ### Demo Video
 
-<video src="./demo_video/demo.mov" width="100%" controls></video>
+<video src="https://github.com/kunaldevsahu/GitInsight-AI/raw/main/demo_video/demo.mov" width="100%" controls="controls"></video>
 
----
-*Created by the Advanced Agentic Coding pipeline.*
+

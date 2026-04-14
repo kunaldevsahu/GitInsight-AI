@@ -17,7 +17,7 @@ if st.button("Analyze Portfolio"):
     if username:
         with st.spinner(f"Running multi-agent analysis for {username}... This may take a minute."):
             try:
-                response = requests.post(f"http://127.0.0.1:8000/review?username={username}")
+                response = requests.post(f"https://gitinsight-ai-r0b5.onrender.com/review?username={username}")
                 
                 if response.status_code == 200:
                     data = response.json()
