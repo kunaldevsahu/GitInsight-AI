@@ -8,7 +8,7 @@ import streamlit as st
 
 st.set_page_config(page_title="GitInsight AI", page_icon="🐙", layout="wide")
 
-API_URL = os.getenv("GITINSIGHT_API_URL", "http://127.0.0.1:8000")
+API_URL = os.getenv("GITINSIGHT_API_URL","https://gitinsight-ai-r0b5.onrender.com")
 
 
 def inject_styles() -> None:
