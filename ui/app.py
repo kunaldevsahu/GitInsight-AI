@@ -40,7 +40,7 @@ def inject_styles() -> None:
 
         .block-container {
             max-width: 1200px;
-            padding-top: 2rem;
+            padding-top: 4.5rem;
             padding-bottom: 3rem;
         }
 
@@ -315,6 +315,16 @@ def fetch_analysis(username: str) -> dict:
 
 
 inject_styles()
+
+st.markdown(
+    """
+    <div style="margin-bottom: 1rem;">
+        <div style="font-size: 2.1rem; font-weight: 700; color: #eff6ff;">GitInsight AI</div>
+        <div class="small-muted">Multi-agent GitHub profile analyzer</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.markdown(
     """
