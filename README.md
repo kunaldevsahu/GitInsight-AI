@@ -1,67 +1,125 @@
-# GitInsight AI - GitHub Portfolio Intelligence Analyzer
+# GitInsight AI
 
-**GitInsight AI** is an advanced, recruiter-grade developer portfolio evaluation platform. It goes far beyond a basic GitHub username lookup by performing a deep, intelligent analysis of a developer's entire GitHub profile—including coding habits, contribution patterns, documentation quality, and open-source reach—using a massive **8-Agent AI Architecture**.
+GitInsight AI is a simple GitHub profile analyzer built with FastAPI, Streamlit, and LangGraph.
 
-## Key Features
+Enter a GitHub username and the app reviews the profile using multiple AI-assisted agents, then shows:
 
-At its core, GitInsight AI operates a cutting-edge multi-agent orchestration pipeline using **LangGraph** & **Llama 3 (via Groq)**. Once a GitHub username is inputted, our architecture spawns 8 specialized agents to evaluate the user:
+- Profile overview
+- Repository insights
+- README and contribution signals
+- Collaboration activity
+- Recruiter readiness score
+- AI mentor feedback
 
-1. **GitHub Profile Extractor**: Fetches core foundational data (bio, followers, active repos).
-2. **Repository Analyzer**: Evaluates the developer’s active projects—calculating deep repository impact based on stars, forks, and codebase focus.
-3. **README Evaluation Agent**: Decodes, parses, and statically scores documentation quality across top repositories (looking for installation instructions, usage, and examples).
-4. **Contribution Intelligence Agent**: Parses public event graphs to assess commit momentum, push streaks, and overall coding consistency over time.
-5. **Code Quality Analyzer Agent**: Leverages the LLM context to do a structural evaluation and pinpoint engineering gaps.
-6. **Open Source Collaboration Agent**: Cross-references GitHub's issue matching API to find pull requests submitted to external/non-owned repositories.
-7. **Recruiter Readiness Agent**: Synthesizes all gathered intelligence indices to calculate a final `/100` **Recruiter Readiness Score**.
-8. **Final AI Mentor Agent**: Acts as an experienced software engineer and tech recruiter, outputting actionable strengths, weaknesses, and improvement areas.
+## How It Works
+
+The app uses an 8-agent workflow:
+
+1. Profile Extractor
+2. Repository Analyzer
+3. README Evaluator
+4. Contribution Intelligence
+5. Code Quality Analyzer
+6. Open Source Collaboration
+7. Recruiter Readiness
+8. AI Mentor
+
+The flow is not fully linear:
+
+- `Profile Extractor` runs first
+- `Repository Analyzer` collects repo data
+- The analysis then fans out to README, contribution, code-quality, and collaboration agents
+- Their outputs are combined by `Recruiter Readiness`
+- `AI Mentor` produces the final summary and next steps
+
+## Current UI
+
+The current Streamlit app includes:
+
+- A simple landing section
+- Score cards for readiness, impact, language, and external PRs
+- A mentor-first summary block near the top
+- Profile metrics and score breakdown charts
+- Repository cards with language, stars, forks, and update time
+- A workflow panel showing the multi-agent pipeline
 
 ## Tech Stack
 
-**Backend / AI Application**
-* **Framework**: FastAPI (for asynchronous robust routing)
-* **AI Orchestration**: LangGraph, LangChain 
-* **LLM**: Meta Llama 3 (via Groq Cloud API for instantaneous inference)
-* **Data Layer**: GitHub REST & GraphQL APIs via `aiohttp` / `requests`
+- Backend: FastAPI
+- Frontend: Streamlit
+- Agent orchestration: LangGraph
+- LLM: Groq via `langchain-groq`
+- Data source: GitHub REST API
 
-**Frontend Dashboard**
-A streamlined, lightweight Streamlit dashboard focused on data visualization and columnized analytical views.
+## Setup
 
-## Installation & Usage
-
-1. **Clone & Setup the Environment**
 ```bash
-git clone <your-repo-link>
-cd github_review
+git clone <your-repo-url>
+cd GitInsight
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. **Configure API Keys**
-Ensure you have an `.env` file at the root of the project with:
+## Environment Variables
+
+Create a `.env` file in the project root:
+
 ```env
 GROQ_API_KEY=your_groq_api_key_here
-GITHUB_TOKEN=your_github_personal_access_token_here
+GITHUB_TOKEN=your_github_token_here
 ```
 
-3. **Start the API Backend (FastAPI)**
+Notes:
+
+- `GROQ_API_KEY` is required for the AI-generated code-quality and mentor outputs.
+- `GITHUB_TOKEN` is recommended to avoid strict GitHub rate limits.
+
+## Run The App
+
+Start the FastAPI backend:
+
 ```bash
-fastapi dev main.py
-# Or run: uvicorn main:app --reload
+uvicorn main:app --reload
 ```
 
-4. **Launch the User Interface**
-   * **To use the Streamlit Dashboard**: Open a new terminal and run:
-     ```bash
-     streamlit run ui/app.py
-     ```
+Start the Streamlit frontend in another terminal:
 
+```bash
+streamlit run ui/app.py
+```
 
-## Dashboard Previews
-Once running, input any public GitHub username (e.g., `torvalds` or `timothycrosley`). The 8 internal intelligence workflows will activate sequentially—culminating in an aggregated, visually stunning readout measuring **Impact**, **Readiness**, and **Mentorship Feedback**.
+Optional:
 
-### Demo Video
+- Set `GITINSIGHT_API_URL` if your backend is running somewhere other than `http://127.0.0.1:8000`
 
-<video src="https://github.com/kunaldevsahu/GitInsight-AI/raw/main/demo_video/demo.mov" width="100%" controls="controls"></video>
+Example:
 
+```bash
+export GITINSIGHT_API_URL=http://127.0.0.1:8000
+streamlit run ui/app.py
+```
 
+## API
+
+### `GET /`
+
+Health check endpoint.
+
+### `POST /review?username=<github_username>`
+
+Runs the GitHub analysis workflow and returns:
+
+- `profile`
+- `repositories`
+- `metrics`
+- `details`
+- `feedback`
+- `workflow`
+- `errors`
+
+## Demo
+
+Demo video:
+
+[demo_video/demo.mov](/Users/kunaldevsahu/Desktop/AI_Projects/GitInsight/demo_video/demo.mov)

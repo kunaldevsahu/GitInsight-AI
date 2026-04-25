@@ -30,6 +30,9 @@ class ReviewState(TypedDict):
     
     # 8. AI Mentor
     mentor_feedback: Optional[Dict[str, Any]]
+
+    # Workflow metadata
+    workflow_summary: Optional[Dict[str, Any]]
     
     # System
     errors: Optional[List[str]]

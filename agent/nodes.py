@@ -1,8 +1,6 @@
 import os
 import requests
-import json
 import base64
-from datetime import datetime
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
@@ -57,11 +55,36 @@ def repository_analyzer_agent(state: ReviewState):
                 "forks": forks,
                 "language": r.get("language"),
                 "description": r.get("description"),
-                "updated_at": r.get("updated_at")
+                "updated_at": r.get("updated_at"),
+                "html_url": r.get("html_url")
             })
             
         repo_impact_score = min(100, (total_stars * 5) + (total_forks * 3) + (len(repos) * 2))
-        return {"repository_analysis": analysis, "repo_impact_score": repo_impact_score}
+        top_languages = {}
+        for repo in analysis:
+            language = repo.get("language") or "Unknown"
+            top_languages[language] = top_languages.get(language, 0) + 1
+
+        workflow_summary = {
+            "mode": "parallel-specialists",
+            "agents": [
+                "Profile Extractor",
+                "Repository Analyzer",
+                "README Evaluator",
+                "Contribution Intelligence",
+                "Code Quality Analyzer",
+                "Open Source Collaboration",
+                "Recruiter Readiness",
+                "AI Mentor",
+            ],
+            "top_languages": dict(sorted(top_languages.items(), key=lambda item: item[1], reverse=True)[:5]),
+        }
+
+        return {
+            "repository_analysis": analysis,
+            "repo_impact_score": repo_impact_score,
+            "workflow_summary": workflow_summary,
+        }
     except Exception as e:
         return {"errors": state.get("errors", []) + [f"repo_analyzer: {str(e)}"]}
 
@@ -172,26 +195,59 @@ def recruiter_readiness_agent(state: ReviewState):
         (collab_score * 0.1) +
         (10 if profile.get("bio") else 0)
     )
-    
-    return {"recruiter_readiness_score": min(100, readiness)}
+
+    return {
+        "recruiter_readiness_score": min(100, readiness),
+        "workflow_summary": {
+            **(state.get("workflow_summary") or {}),
+            "completed": [
+                "Profile Extractor",
+                "Repository Analyzer",
+                "README Evaluator",
+                "Contribution Intelligence",
+                "Code Quality Analyzer",
+                "Open Source Collaboration",
+                "Recruiter Readiness",
+            ],
+        },
+    }
 
 def ai_mentor_agent(state: ReviewState):
     prompt = f"""
-    You are an expert tech recruiter and AI mentor. Analyze this GitHub profile overview and create a concise review.
+    You are an expert tech recruiter and AI mentor. Analyze this GitHub profile overview and create a concise but high-value review.
     Profile: {state.get("extracted_profile")}
     Readiness Score: {state.get("recruiter_readiness_score")}/100
     Repo Impact: {state.get("repo_impact_score")}
+    README Score: {state.get("overall_readme_score")}
     Consistency: {state.get("consistency_score")}
+    Collaboration: {state.get("collaboration_score")}
+    Repository Snapshot: {state.get("repository_analysis", [])[:3]}
     
     Provide:
-    1. 2 Strengths
-    2. 2 Weaknesses
-    3. 2 Actionable career/improvement steps
+    1. A one-line overall verdict
+    2. 2 strongest signals
+    3. 2 biggest gaps
+    4. 3 actionable next steps, ordered by priority
     
-    Return pure text without conversational baggage. Use clean formatting.
+    Return pure text without conversational baggage. Use clean markdown headings and bullets.
     """
     try:
         res = llm.invoke([HumanMessage(content=prompt)])
-        return {"mentor_feedback": {"feedback_text": res.content}}
+        return {
+            "mentor_feedback": {"feedback_text": res.content},
+            "workflow_summary": {
+                **(state.get("workflow_summary") or {}),
+                "completed": [
+                    "Profile Extractor",
+                    "Repository Analyzer",
+                    "README Evaluator",
+                    "Contribution Intelligence",
+                    "Code Quality Analyzer",
+                    "Open Source Collaboration",
+                    "Recruiter Readiness",
+                    "AI Mentor",
+                ],
+            },
+        }
     except:
         return {"mentor_feedback": {"feedback_text": "Error generating mentor feedback."}}

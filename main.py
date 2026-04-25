@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from agent.graph import github_reviewer_app
 
 app = FastAPI()
@@ -39,5 +38,7 @@ def review_portfolio(username: str):
             "code_quality": result.get("code_quality_analysis"),
             "collaboration": result.get("open_source_collaboration")
         },
-        "feedback": result.get("mentor_feedback")
+        "feedback": result.get("mentor_feedback"),
+        "workflow": result.get("workflow_summary"),
+        "errors": result.get("errors", [])
     }

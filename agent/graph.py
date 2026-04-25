@@ -22,13 +22,20 @@ builder.add_node("os_collaboration", open_source_collaboration_agent)
 builder.add_node("recruiter_readiness", recruiter_readiness_agent)
 builder.add_node("ai_mentor", ai_mentor_agent)
 
-# Linear flow for simplicity, though can be parallelized
+# Start with the profile, then analyze repositories once.
 builder.add_edge(START, "profile_extractor")
 builder.add_edge("profile_extractor", "repository_analyzer")
+
+# Fan out into specialized agents after repository analysis.
 builder.add_edge("repository_analyzer", "readme_evaluator")
-builder.add_edge("readme_evaluator", "contribution_intelligence")
-builder.add_edge("contribution_intelligence", "code_quality")
-builder.add_edge("code_quality", "os_collaboration")
+builder.add_edge("repository_analyzer", "contribution_intelligence")
+builder.add_edge("repository_analyzer", "code_quality")
+builder.add_edge("repository_analyzer", "os_collaboration")
+
+# Fan in once the specialist agents have produced their signals.
+builder.add_edge("readme_evaluator", "recruiter_readiness")
+builder.add_edge("contribution_intelligence", "recruiter_readiness")
+builder.add_edge("code_quality", "recruiter_readiness")
 builder.add_edge("os_collaboration", "recruiter_readiness")
 builder.add_edge("recruiter_readiness", "ai_mentor")
 builder.add_edge("ai_mentor", END)
